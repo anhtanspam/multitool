@@ -117,7 +117,7 @@ class ProfileManager:
                 print(f"Đã có lỗi xảy ra: {tenProfile}>>>Đang quay lại từ đầu.")
                 time.sleep(5)
                 continue
-        if x > 8:
+        if x > 7:
             self.notpixel_fang(driver, tenProfile, profile_id)
         else:
             self.blum_fang(driver, tenProfile, profile_id)
