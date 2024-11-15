@@ -516,7 +516,7 @@ class ProfileManager:
         for sec in range(seconds, 0, -1):
             print(f'Continue in {sec}s !')
             time.sleep(1)
-    def resset_all_ip():
+    def resset_all_ip(self):
         print("Đang reset IP để chạy turn tiếp")
         requests.get(f"http://{dataLoad.proxyLink}:6868/reset_all")
         print("----Reset IP thành công, Vui lòng đợi 20s !------")
