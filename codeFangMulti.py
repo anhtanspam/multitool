@@ -1253,7 +1253,7 @@ class ProfileManager:
     def run_turn(self):
 
         try:
-            for i in range(40, 5000, self.accPerTurn):
+            for i in range(0, 5000, self.numberDcom):
                 print(f"Turn bắt đầu từ acc: {self.fileExcelLoad.iloc[i, 0]} and {self.fileExcelLoad.iloc[i, 2]}")
                 run1_threads = []
                 for p in range(self.numberDcom):
@@ -1266,7 +1266,7 @@ class ProfileManager:
                 print("Proxy reset xong, bắt đầu Quất acc...")
                 idBeginturnacc = str(self.fileExcelLoad.iloc[i, 1])
                 if len(idBeginturnacc) < 10:
-                    print("Không đủ acc để chạy. Kết thúc.")
+                    print("Đã chạy xong lô acc >>> Dừng tool.")
                     break
 
                 run_threads = []
