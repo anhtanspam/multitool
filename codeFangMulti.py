@@ -15,6 +15,7 @@ import dataLoad
 
 class ProfileManager:
     def __init__(self):
+        self.choseBlumAuto = 1 #SET 2 NẾU LÀM TASK NHIỆM VỤ, SET 1 NẾU LOAD NHẶT LÁ
         self.link_check = f"http://{dataLoad.proxyLink}:6868/status?proxy={dataLoad.proxyLink}:"
         self.link_reset = f"http://{dataLoad.proxyLink}:6868/reset?proxy={dataLoad.proxyLink}:"
         self.link_get_ip = f"http://{dataLoad.proxyLink}:6868/api/v1/proxy/public_ip?proxy={dataLoad.proxyLink}:"
@@ -90,7 +91,7 @@ class ProfileManager:
             idTab1 = self.fileExcelLoad.iloc[rowProfile, 3]
         tenProfile = str(tenProfile1)         
         profile_id = idTab1.strip()
-        for openChrome in range(6):
+        for openChrome in range(12):
             try:
                 win_pos_value = self.calculate_window_position(x)
                 params = {
@@ -110,8 +111,8 @@ class ProfileManager:
                     service = Service(driver_path)
                     driver = webdriver.Chrome(service=service, options=chrome_options)
                     self.close_extra_tabs(driver)
-                    print(f"Profile {tenProfile} mở thành công, code:{success_value}...Delay 6s before loading...")
-                    time.sleep(6)
+                    print(f"Profile {tenProfile} mở thành công, code:{success_value}...Delay 11s before loading...")
+                    time.sleep(11)
                     break
             except Exception as e:
                 print(f"Đã có lỗi xảy ra: {tenProfile}>>>Đang quay lại từ đầu.")
@@ -120,7 +121,10 @@ class ProfileManager:
         if x > 7:
             self.notpixel_fang(driver, tenProfile, profile_id)
         else:
-            self.blum_fang(driver, tenProfile, profile_id)
+            if self.choseBlumAuto == 1:
+                self.blum_fang(driver, tenProfile, profile_id)
+            else:
+                self.blum_nhiemvu_fang(driver, tenProfile, profile_id)
 
 
     def calculate_window_position(self, x):
@@ -143,7 +147,7 @@ class ProfileManager:
             time.sleep(0.5)
     def blum_fang(self, driver, tenProfile, profile_id):
         try:
-            for ff in range (5):
+            for ff in range (8):
                 driver.get('https://web.telegram.org/k/')
                 try:
                     element = WebDriverWait(driver, 6).until(EC.presence_of_element_located((By.XPATH, '//h4[text()="Log in to Telegram by QR Code"]')))                    
@@ -249,6 +253,772 @@ class ProfileManager:
             self.close_profile(profile_id)
         finally:
             self.close_profile(profile_id)
+    def blum_nhiemvu_fang(self, driver, tenProfile, profile_id):
+        driver.switch_to.window(driver.window_handles[0])
+        time.sleep(1)
+        driver.execute_script("window.open('chrome://settings/', '_blank');")
+        time.sleep(1)
+        driver.switch_to.window(driver.window_handles[1])
+        time.sleep(2)
+        driver.switch_to.window(driver.window_handles[0])
+        try:
+            for ff in range (8):
+                driver.get('https://web.telegram.org/k/')
+                try:
+                    element = WebDriverWait(driver, 6).until(EC.presence_of_element_located((By.XPATH, '//h4[text()="Log in to Telegram by QR Code"]')))                    
+                    print(f'{tenProfile}>>>acc DIE')
+                    with open(self.linkNoteAccDie, 'a+') as noteAccDie:
+                        noteAccDie.write(f'{tenProfile}|Die\n')
+                    time.sleep(1)
+                    self.close_profile(self, profile_id)
+                except:pass
+                for l in range(10):
+                    try:
+                        time.sleep(1)
+                        driver.get("chrome://settings/")
+                        time.sleep(1)
+                        driver.get(self.ref_group_link_blum)
+                        element = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, f'//span[@class="translatable-message"]//a[text()="{self.linkRefBlum}"]')))
+                        driver.execute_script("arguments[0].click();", element)
+                        try:
+                            element = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, '//span[text()="Launch"]')))
+                            driver.execute_script("arguments[0].click();", element)
+                        except:pass                
+                        elementIframe = WebDriverWait(driver, 8).until(EC.presence_of_element_located((By.XPATH, '//iframe[@class="payment-verification"]')))                        
+                        break
+                    except:pass
+                iframe = WebDriverWait(driver, 50).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                for dd in range(1,19,1):
+                    print(f'>>{tenProfile}-try checkin turn: {dd}/18')
+                    try:
+                        elementReload = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH, '//button[@class="reset"]')))
+                        elementReload.click()
+                    except:pass           
+                    try:
+                        elementTask = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.XPATH, '//div[@class="pages-index-index"]/div[3]//div[text()="Farming"][1]')))
+                        break
+                    except:pass
+                    try:
+                        element = WebDriverWait(driver, 3).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="daily-reward-page page no-padding"]//div[@class="kit-fixed-wrapper no-layout-tabs"]//button[1]/div[2]')))
+                        driver.execute_script("arguments[0].click();", element)
+                    except:pass
+                    try:
+                        element = WebDriverWait(driver, 3).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="pages-index-index"]/div[3]//div[text()="Claim"]')))
+                        driver.execute_script("arguments[0].click();", element)
+                    except:pass
+                    try:
+                        element = WebDriverWait(driver, 3).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="pages-index-index"]/div[3]//div[@class="button-label"]/span[1]')))
+                        driver.execute_script("arguments[0].click();", element)
+                    except:pass
+                try:
+                    elementTask = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//div[@class="pages-index-index"]/div[3]//div[text()="Farming"][1]')))
+                    print(f'``{tenProfile} Check in ok>>>>playgame')
+                    break
+                except:pass      
+                #############################################
+            element = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="layout-tabs tabs"]/a[2]')))
+            driver.execute_script("arguments[0].click();", element)
+            for clickBar in range(4,3,-1):
+                c1Bar = str(clickBar)
+                for fixError in range(6):
+                    try:
+                        element = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH, '//button[@class="reset"]')))
+                        element.click()
+                    except:
+                        print(f'>>{tenProfile}-Không có lỗi xảy ra...')
+                        break
+                    if fixError == 5:
+                        for ff in range (6):                            
+                            try:
+                                time.sleep(1)
+                                driver.get("chrome://settings/")
+                                time.sleep(1)
+                                driver.get(self.ref_group_link_blum)
+                                element = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, f'//span[@class="translatable-message"]//a[text()="{self.linkRefBlum}"]')))
+                                driver.execute_script("arguments[0].click();", element)
+                                try:
+                                    element = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, '//span[text()="Launch"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass                
+                                elementIframe = WebDriverWait(driver, 8).until(EC.presence_of_element_located((By.XPATH, '//iframe[@class="payment-verification"]')))                        
+                                break
+                            except:pass
+                        iframe = WebDriverWait(driver, 50).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))                    
+                        for dd in range(1,19,1):
+                            print(f'>>{tenProfile}-try checkin turn: {dd}/18')
+                            try:
+                                elementReload = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH, '//button[@class="reset"]')))
+                                elementReload.click()
+                            except:pass           
+                            try:
+                                elementTask = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.XPATH, '//div[@class="pages-index-index"]/div[3]//div[text()="Farming"][1]')))
+                                break
+                            except:pass
+                            try:
+                                element = WebDriverWait(driver, 3).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="daily-reward-page page no-padding"]//div[@class="kit-fixed-wrapper no-layout-tabs"]//button[1]/div[2]')))
+                                driver.execute_script("arguments[0].click();", element)
+                            except:pass
+                            try:
+                                element = WebDriverWait(driver, 3).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="pages-index-index"]/div[3]//div[text()="Claim"]')))
+                                driver.execute_script("arguments[0].click();", element)
+                            except:pass
+                            try:
+                                element = WebDriverWait(driver, 3).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="pages-index-index"]/div[3]//div[@class="button-label"]/span[1]')))
+                                driver.execute_script("arguments[0].click();", element)
+                            except:pass
+                            try:
+                                elementTask = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//div[@class="pages-index-index"]/div[3]//div[text()="Farming"][1]')))
+                                print(f'``{tenProfile} Check in ok>>>>playgame')
+                                break
+                            except:pass              
+                            #############################################
+                        element = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="layout-tabs tabs"]/a[2]')))
+                        driver.execute_script("arguments[0].click();", element)
+                        for fixError2 in range(3):
+                            try:
+                                element = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH, '//button[@class="reset"]')))
+                                element.click()
+                            except:
+                                print(f'>>{tenProfile}-Không có lỗi xảy ra...')
+                                break
+                            if fixError2==2:
+                                self.close_profile(profile_id)
+                            else:pass
+                if c1Bar==2:pass                    
+                else:
+                    ###333
+                    element = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="pages-tasks-list is-short-card"]/div[3]//div[text()="Mở"]')))
+                    driver.execute_script("arguments[0].click();", element)                        
+                    for cst in range(3):
+                        print(f'>>>>>>{tenProfile}-try click start: {cst}')
+                        try:
+                            element = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="pages-tasks-subtasks-modal"]//div[text()="Bắt đầu"][1]')))
+                            driver.execute_script("arguments[0].click();", element)
+                            print(f'{tenProfile} clicked [start]')
+                            driver.switch_to.window(driver.window_handles[1])
+                            time.sleep(0.5)
+                            try:
+                                driver.switch_to.window(driver.window_handles[2])
+                                driver.close()
+                                time.sleep(0.3)
+                            except:pass
+                            driver.switch_to.window(driver.window_handles[1])
+                            driver.get("chrome://settings/")
+                            time.sleep(3)
+                            driver.switch_to.window(driver.window_handles[0])
+                            iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                        except:break
+                    try:
+                        element = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//button[@class="kit-button is-medium is-ghost is-icon-only close-btn"]/div[3]/div[1]')))
+                        driver.execute_script("arguments[0].click();", element)
+                    except:pass
+                    ######
+                    try:
+                        element = WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, f'//div[@class="list"]/label[{c1Bar}]')))
+                        driver.execute_script("arguments[0].click();", element)
+                        time.sleep(2)
+                    except:pass
+                    js_code2 = "arguments[0].scrollIntoView();"
+                    element = driver.find_element(By.XPATH, f'//div[@class="list"]/label[{c1Bar}]')
+                    driver.execute_script(js_code2, element)
+                    try:
+                        for c1Start in range(1,101,1):                    
+                            print(f'@{tenProfile}> Đang Click <START> lần {c1Start}/100')
+                            element = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="sections"]/div[3]//div[text()="Bắt đầu"][1]')))
+                            driver.execute_script("arguments[0].click();", element)
+                            try:
+                                for tab in range(2,5,1):
+                                    driver.switch_to.window(driver.window_handles[tab])
+                                    driver.close()
+                                    time.sleep(0.3)
+                            except:time.sleep(0.5)
+                            driver.switch_to.window(driver.window_handles[1])
+                            driver.get("chrome://settings/")
+                            time.sleep(5)
+                            driver.switch_to.window(driver.window_handles[0])
+                            iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                    except:
+                        print(f'@{tenProfile}> Không còn <START>')
+                    try:
+                        for qv in range(1,101,1):
+                            print(f'{tenProfile} đang tìm verify lần {qv}/100')              
+                            element = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//div[text()="Xác minh"][1]')))
+                            driver.execute_script("arguments[0].click();", element)
+                            element = WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, '//div[@class="heading"]//div[@class="title"]')))
+                            titleTask = element.text
+                            if titleTask == "What is On-chain Analysis?":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("BLUMEXTRA")
+                                for kg in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "What is Slippage?":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("CRYPTOBUZZ")
+                                for kg in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "What’s Next for DeFi?":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("BLUMNOW")
+                                for kg in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "Understanding Gas Fees":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("CRYPTOGAS")
+                                for kg in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "Choosing a Crypto Exchange":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("CRYPTOZONE")
+                                for kg in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "Node Sales in Crypto":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("BLUMIFY")
+                                for kg in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "What's Crypto DEX?":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("DEXXX")
+                                for kg in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "Crypto Slang. Part 2":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("FOMOOO")
+                                for kg in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "DeFi Risks: Key Insights":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("BLUMHELPS")
+                                for kg in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "Pumptober Special":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("PUMPIT")
+                                for kg in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "DeFi Explained":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("BLUMFORCE")
+                                for kg in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "Crypto Slang. Part 1":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("BLUMSTORM")
+                                for kf in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "How To Find Altcoins?":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("ULTRABLUM")
+                                for kf in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "Sharding Explained":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("BLUMTASTIC")
+                                for kf in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "How to trade Perps?":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("CRYPTOFAN")
+                                for kf in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "Crypto Terms. Part 1":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("BLUMEXPLORER")
+                                for kf in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "Bitcoin Rainbow Chart?":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("SOBLUM")
+                                for kf in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "Token Burning: How & Why?":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("ONFIRE")
+                                for kf in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "How to Memecoin?":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("MEMEBLUM")
+                                for kf in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "Pre-Market Trading?":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("WOWBLUM")
+                                for kf in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "Doxxing? What's that?":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("NODOXXING")
+                                for kf in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "$2.5M+ DOGS Airdrop":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("HAPPYDOGS")
+                                for kf in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "Liquidity Pools Guide":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("BLUMERSSS")
+                                for kf in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "What Are AMMs?":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("CRYPTOSMART")
+                                for kf in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "Say No to Rug Pull!":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("SUPERBLUM")
+                                for kf in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "What are Telegram Mini Apps?":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("CRYPTOBLUM")
+                                for kf in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "Navigating Crypto":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("HEYBLUM")
+                                for kf in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "Secure your Crypto!":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("BEST PROJECT EVER")
+                                for kf in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "Forks Explained":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("GO GET")
+                                for kf in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            elif titleTask == "How to Analyze Crypto?":
+                                element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//input[@placeholder="Keyword"]')))
+                                element.send_keys("VALUE")
+                                for kf in range(5):
+                                    try:
+                                        element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="kit-fixed-wrapper no-layout-tabs"]//div[text()="Verify"]')))
+                                        driver.execute_script("arguments[0].click();", element)
+                                    except:break
+                                    time.sleep(1)
+                                try:
+                                    driver.switch_to.default_content()
+                                    element = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="animated-close-icon state-back"]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                except:pass
+                                time.sleep(1)
+                                iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                            else:pass
+                    except:
+                        print(f'Hết <verify> in {tenProfile}')
+                    try:
+                        for c1Claim in range(1,101,1):                    
+                            element = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//div[text()="Claim"][1]')))
+                            driver.execute_script("arguments[0].click();", element)
+                            print(f'{tenProfile} clicked <claim> turn {c1Claim}/50')
+                            time.sleep(5)
+                    except:print(f'Hết <CLAIM> in: {tenProfile}')
+                # #############################################
+        
+            print(f'>>{tenProfile} VÀO LÀM 540')
+            js_code3 = "arguments[0].scrollIntoView();"
+            element = driver.find_element(By.XPATH, '//div[text()="Weekly"]')
+            driver.execute_script(js_code3, element)
+            for fap in range (1):
+                try:
+                    elementError = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH, '//div[text()="We are already on the issue"]')))
+                    elementReload = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH, '//button[@class="reset"]')))
+                    elementReload.click()
+                except:
+                    print(f'>>{tenProfile}-taskWeekly Không có lỗi xảy ra...') 
+                print(f'{tenProfile} lần: {fap}/1>>>>>>')               
+                try:
+                    try:
+                        element = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH, '//button[@class="reset"]')))
+                        element.click()
+                    except:print(f'>>{tenProfile}-Không có lỗi xảy ra...')
+                    try:
+                        element = WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.XPATH, '//div[@class="pages-tasks-list is-short-card"]//div[@class="kit-icon done-icon"]')))
+                        print(f'{tenProfile} ĐÃ LÀM 540!')
+                        break
+                    except:
+                        element = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="pages-tasks-list is-short-card"]/div[2]//div[text()="Mở"]')))
+                        driver.execute_script("arguments[0].click();", element)
+                        for fwl in range(1):
+                            print(f'>>>>>>{tenProfile}-turn try: {fwl}/8...')
+                            try:
+                                element = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.XPATH, '//span[text()="Earn for checking socials 5/5"]')))
+                                print(f'{tenProfile} Done weekly task !')
+                                break
+                            except:pass
+                            for cst in range(7):
+                                print(f'>>>>>>{tenProfile}-try click start: {cst}/6...')
+                                try:
+                                    element = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="pages-tasks-subtasks-modal"]//div[text()="Bắt đầu"][1]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                    print(f'{tenProfile} clicked [start]')
+                                    driver.switch_to.window(driver.window_handles[1])
+                                    time.sleep(0.5)
+                                    try:
+                                        driver.switch_to.window(driver.window_handles[2])
+                                        driver.close()
+                                        time.sleep(0.3)
+                                    except:pass
+                                    driver.switch_to.window(driver.window_handles[1])
+                                    driver.get("chrome://settings/")
+                                    time.sleep(3)
+                                    driver.switch_to.window(driver.window_handles[0])
+                                    iframe = WebDriverWait(driver, 20).until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe[@class="payment-verification"]')))
+                                except:break
+                            for cickClaim in range(7):
+                                try:
+                                    element = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//div[text()="Claim"][1]')))
+                                    driver.execute_script("arguments[0].click();", element)
+                                    time.sleep(5)
+                                except:break
+                        try:
+                            element = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//button[@class="kit-button is-medium is-ghost is-icon-only close-btn"]/div[3]/div[1]')))
+                            driver.execute_script("arguments[0].click();", element)
+                        except:pass
+                except:print(f'{tenProfile} Done weeklytask')
+            element = WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.XPATH, '//div[@class="pages-tasks-list is-short-card"]/div[3]//div[text()="Mở"]')))
+            driver.execute_script("arguments[0].click();", element)
+            try:
+                for cickClaim in range(7):            
+                    element = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//div[text()="Claim"][1]')))
+                    driver.execute_script("arguments[0].click();", element)
+                    time.sleep(5)
+            except:pass
+            try:
+                element = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//button[@class="kit-button is-medium is-ghost is-icon-only close-btn"]/div[3]/div[1]')))
+                driver.execute_script("arguments[0].click();", element)
+            except:pass
+            print(f'@@@@@@@@@@@Done acc {tenProfile}, Closing.....')
+            time.sleep(2)
+        except Exception as e:
+            print(f"Acc {tenProfile} Pain notpixel FAIL-saving info to file note !!!!")
+            self.save_fail_info(tenProfile, profile_id)
+            self.close_profile(profile_id)
+        finally:
+            self.close_profile(profile_id)
     def notpixel_fang(self, driver, tenProfile, profile_id):
         try:
             for checkAcc in range(8):
@@ -268,7 +1038,9 @@ class ProfileManager:
                 try:
                     element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//h4[text()="Log in to Telegram by QR Code"]')))
                     print(f'{tenProfile}>>>acc DIE')
-                    self.save_fail_info(tenProfile, profile_id)
+                    with open(self.linkNoteAccDie, 'a+') as noteAccDie:
+                        noteAccDie.write(f'{tenProfile}|Die\n')
+                    time.sleep(1)
                     self.close_profile(profile_id)
                 except:pass
                 try:
@@ -481,7 +1253,7 @@ class ProfileManager:
     def run_turn(self):
 
         try:
-            for i in range(0, 5000, self.accPerTurn):
+            for i in range(40, 5000, self.accPerTurn):
                 print(f"Turn bắt đầu từ acc: {self.fileExcelLoad.iloc[i, 0]} and {self.fileExcelLoad.iloc[i, 2]}")
                 run1_threads = []
                 for p in range(self.numberDcom):
@@ -507,7 +1279,7 @@ class ProfileManager:
 
                 print(">> ĐÃ QUẤT XONG TURN ACC !!!")
                 print("Đang vào chạy turn tiếp theo...")
-                self.resset_all_ip()
+                self.reset_all_ip()
                 self.countdown(20)
         except Exception as e:
             print(f'Lỗi xảy ra trong khi chạy: {str(e)}')
@@ -516,7 +1288,7 @@ class ProfileManager:
         for sec in range(seconds, 0, -1):
             print(f'Continue in {sec}s !')
             time.sleep(1)
-    def resset_all_ip(self):
+    def reset_all_ip(self):
         print("Đang reset IP để chạy turn tiếp")
         requests.get(f"http://{dataLoad.proxyLink}:6868/reset_all")
         print("----Reset IP thành công, Vui lòng đợi 20s !------")
