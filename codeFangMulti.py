@@ -1283,6 +1283,8 @@ class ProfileManager:
                 self.countdown(20)
         except Exception as e:
             print(f'Lỗi xảy ra trong khi chạy: {str(e)}')
+        finally:
+            print(f'>>>Đã xong lô acc !!!')
 
     def countdown(self, seconds):
         for sec in range(seconds, 0, -1):
