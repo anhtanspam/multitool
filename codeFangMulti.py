@@ -312,7 +312,7 @@ class ProfileManager:
                     except:pass
                 try:
                     elementTask = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//div[@class="pages-index-index"]/div[3]//div[text()="Farming"][1]')))
-                    print(f'``{tenProfile} Check in ok>>>>playgame')
+                    print(f'``{tenProfile} Check in ok>>>>Vào fang task')
                     break
                 except:pass      
                 #############################################
